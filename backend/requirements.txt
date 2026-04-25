@@ -1,0 +1,6 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==1.4.50  # Use version compatible with databases
+pydantic==2.5.0
+python-dotenv==1.0.0
+databases[aiosqlite]==0.8.0  # For SQLite support
