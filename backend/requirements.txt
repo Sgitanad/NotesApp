@@ -1,6 +1,8 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-sqlalchemy==1.4.50  # Use version compatible with databases
+sqlalchemy==2.0.23
 pydantic==2.5.0
 python-dotenv==1.0.0
-databases[aiosqlite]==0.8.0  # For SQLite support
+sentry-sdk[fastapi]==1.40.0
+prometheus-fastapi-instrumentator==6.1.0
+structlog==24.1.0

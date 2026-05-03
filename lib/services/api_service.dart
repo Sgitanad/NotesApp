@@ -1,11 +1,9 @@
 import 'dart:convert';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../models/note.dart';
 
 class ApiService {
-  // For Android emulator: 10.0.2.2
-  // For iOS simulator: localhost
-  // For physical device: Your computer's IP address
   static const String baseUrl = 'http://127.0.0.1:8000';
   
   final http.Client client = http.Client();
@@ -41,17 +39,23 @@ class ApiService {
     }
   }
 
-  // Get all notes
+  // Get all notes — with Sentry tracing
   Future<List<Note>> getNotes() async {
-    final response = await client.get(
-      Uri.parse('$baseUrl/notes/'),
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => Note.fromJson(json)).toList();
-    } else {
+    final transaction = Sentry.startTransaction('api.getNotes', 'http');
+    try {
+      final response = await client.get(Uri.parse('$baseUrl/notes/'));
+      if (response.statusCode == 200) {
+        return (jsonDecode(response.body) as List)
+            .map((j) => Note.fromJson(j))
+            .toList();
+      }
       throw Exception('Failed to load notes: ${response.statusCode}');
+    } catch (e, stackTrace) {
+      await Sentry.captureException(e, stackTrace: stackTrace);
+      transaction.status = const SpanStatus.internalError();
+      rethrow;
+    } finally {
+      await transaction.finish();
     }
   }
 
