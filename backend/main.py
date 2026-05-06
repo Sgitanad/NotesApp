@@ -3,9 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
-import sentry_sdk
-from sentry_sdk.integrations.fastapi import FastApiIntegration
-from prometheus_fastapi_instrumentator import Instrumentator
 import models, schemas
 from database import SessionLocal, engine
 
@@ -91,18 +88,6 @@ def delete_note(note_id: int, db: Session = Depends(get_db)):
     db.delete(note)
     db.commit()
     return {"message": "Note deleted successfully"}
-
-sentry_sdk.init(
-    dsn="https://YOUR_BACKEND_DSN@sentry.io/YOUR_PROJECT",
-    integrations=[FastApiIntegration()],
-    traces_sample_rate=1.0,
-    environment="development",
-)
-
-app = FastAPI()
-
-# Prometheus metrics exposed at GET /metrics
-Instrumentator().instrument(app).expose(app)
 
 @app.get("/")
 def root():

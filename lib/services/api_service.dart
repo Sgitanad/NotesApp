@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http;  // ADD THIS
 import '../models/note.dart';
 
 class ApiService {
@@ -39,9 +38,8 @@ class ApiService {
     }
   }
 
-  // Get all notes — with Sentry tracing
-  Future<List<Note>> getNotes() async {
-    final transaction = Sentry.startTransaction('api.getNotes', 'http');
+  // Get all notes
+  Future<List<Note>> getNotes() async {          // REMOVE comment "— with Sentry tracing"
     try {
       final response = await client.get(Uri.parse('$baseUrl/notes/'));
       if (response.statusCode == 200) {
@@ -50,13 +48,9 @@ class ApiService {
             .toList();
       }
       throw Exception('Failed to load notes: ${response.statusCode}');
-    } catch (e, stackTrace) {
-      await Sentry.captureException(e, stackTrace: stackTrace);
-      transaction.status = const SpanStatus.internalError();
+    } catch (e) {                                // REMOVE ", stackTrace" parameter
       rethrow;
-    } finally {
-      await transaction.finish();
-    }
+    }                                            // REMOVE the finally block entirely
   }
 
   // Get a single note

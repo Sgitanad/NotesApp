@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.1.0
-  sentry_flutter: ^8.9.0
 
 dev_dependencies:
   flutter_test:
