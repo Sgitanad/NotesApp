@@ -2,7 +2,7 @@ name: Flutter + FastAPI CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, Copy-test ]  # ← ADD Copy-test
   pull_request:
     branches: [ main ]
 
