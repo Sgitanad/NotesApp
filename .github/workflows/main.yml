@@ -32,7 +32,7 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}   # ← ADDED
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           pytest . -v --ignore=notes.db || true
 
@@ -88,7 +88,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Web                                                                          # ← CHANGED
+      - name: Build Web
         run: flutter build web --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }}
 
       - name: Upload web build artifact
@@ -123,7 +123,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK                                                                          # ← CHANGED
+      - name: Build APK
         run: flutter build apk --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} || true
 
       - name: Upload APK artifact
@@ -139,4 +139,22 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [backend-test, flutter-build-web]
-    if: github.ref
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: flutter-web-build
+          path: build/web
+
+      - name: Deploy Backend to server
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          echo "Add your deploy commands here"
+          # Example: rsync, SSH, Docker push, etc.
