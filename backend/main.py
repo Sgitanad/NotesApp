@@ -1,4 +1,4 @@
-import os                                          # ← ADDED
+import os
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -9,10 +9,10 @@ from database import SessionLocal, engine
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
-# Init Sentry FIRST before anything else            # ← MOVED TO TOP
 sentry_sdk.init(
-    dsn=os.getenv("SENTRY_DSN"),                   # ← CHANGED
+    dsn=os.getenv("SENTRY_DSN_BACKEND"),          # ← CHANGED
     integrations=[FastApiIntegration()],
+    send_default_pii=True,                         # ← ADDED
     traces_sample_rate=1.0,
     environment="production",
 )
@@ -20,7 +20,7 @@ sentry_sdk.init(
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Notes API", version="1.0.0")  # ← ONLY ONCE
+app = FastAPI(title="Notes API", version="1.0.0")
 
 # Configure CORS for Flutter
 app.add_middleware(
@@ -43,6 +43,11 @@ def get_db():
 @app.get("/")
 def read_root():
     return {"message": "Notes API is running", "version": "1.0.0"}
+
+# Sentry test route — REMOVE AFTER TESTING          # ← ADDED
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
 
 # Create a new note
 @app.post("/notes/", response_model=schemas.Note)

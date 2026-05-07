@@ -5,7 +5,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 Future<void> main() async {
   await SentryFlutter.init(
     (options) {
-      options.dsn = const String.fromEnvironment('SENTRY_DSN');
+      options.dsn = const String.fromEnvironment('SENTRY_DSN_FLUTTER');
       options.tracesSampleRate = 1.0;
     },
     appRunner: () => runApp(const MyApp()),

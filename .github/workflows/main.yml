@@ -2,7 +2,7 @@ name: Flutter + FastAPI CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop, Copy-test ]  # ← ADD Copy-test
+    branches: [ main, develop, Copy_test ]
   pull_request:
     branches: [ main ]
 
@@ -32,7 +32,7 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN_BACKEND }}        # ← CHANGED
         run: |
           pytest . -v --ignore=notes.db || true
 
@@ -89,7 +89,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+        run: flutter build web --release --dart-define=SENTRY_DSN_FLUTTER=${{ secrets.SENTRY_DSN_FLUTTER }}   # ← CHANGED
 
       - name: Upload web build artifact
         uses: actions/upload-artifact@v4
@@ -124,7 +124,7 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} || true
+        run: flutter build apk --release --dart-define=SENTRY_DSN_FLUTTER=${{ secrets.SENTRY_DSN_FLUTTER }} || true   # ← CHANGED
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -154,7 +154,8 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_DSN_BACKEND: ${{ secrets.SENTRY_DSN_BACKEND }}      # ← CHANGED
+          SENTRY_DSN_FLUTTER: ${{ secrets.SENTRY_DSN_FLUTTER }}      # ← CHANGED
         run: |
           echo "Add your deploy commands here"
           # Example: rsync, SSH, Docker push, etc.
