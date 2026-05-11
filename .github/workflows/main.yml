@@ -1,3 +1,4 @@
+# trigger pipeline - sentry test
 name: Flutter + FastAPI CI/CD Pipeline
 
 on:
